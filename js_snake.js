@@ -4,6 +4,39 @@ KEY.DOWN = 40;
 KEY.LEFT = 37;
 KEY.RIGHT = 39;
 
+var DIRECTION = {};
+DIRECTION.UP = 1;
+DIRECTION.DOWN = 2;
+DIRECTION.LEFT = 3;
+DIRECTION.RIGHT = 4;
+
+var Segment = function(x,y) {
+    this.x=x;
+    this.y=y;
+    this.direction = null;
+}
+
+Segment.prototype.move = function (width, height ) {
+    switch(this.direction) {
+    case DIRECTION.UP :
+	this.y = ( this.y - 1) % height;
+	break;
+    case DIRECTION.DOWN :
+	this.y = ( this.y + 1 ) % height;
+	break;
+    case DIRECTION.LEFT :
+	this.x = ( this.x - 1 ) % width;
+	break;
+    case DIRECTION.RIGHT :
+	this.x = ( this.x + 1 ) % width;
+	break;
+    }
+    if( this.x < 0 )
+	this.x = width + this.x;
+    if( this.y < 0 )
+	this.y = height + this.y;
+}
+
 var Game = function(canvasId) {
     this.canvas = document.getElementById(canvasId);
     this.ctx = this.canvas.getContext("2d");
@@ -18,9 +51,36 @@ var Game = function(canvasId) {
     this.canvas.setAttribute('tabindex','0');
     this.canvas.focus();
     this.cycle=0;
+    this.segments = [];
+    this.initSegments();
     var instance = this;
     $("#"+canvasId).keydown( function(event) { instance.keyDown(event.keyCode); } );
     window.setTimeout( function  callBack() { window.setTimeout(callBack,30); instance.update(); } , 30 );
+}
+
+Game.prototype.initSegments = function () {
+    for(var i = 0; i < 3; i ++ ) {
+	this.segments.push( new Segment(12 - i , 12) );
+	this.segments[i].direction = DIRECTION.RIGHT;
+    }
+}
+
+
+Game.prototype.moveSnake = function () {
+    if( this.cycle % 10 == 0 ) {
+	for( var i = 0; i < this.segments.length; i++ ) {
+	    this.segments[i].move( this.width , this.height );
+	}
+	for( var i = this.segments.length - 1; i > 0; i-- ) {
+	    this.segments[i].direction = this.segments[ i - 1 ].direction;
+	}
+    }
+}
+
+Game.prototype.drawSnake = function () {
+    for(var i = 0; i < this.segments.length; i++ ) {
+	this.drawRectangle( this.segments[i].x , this.segments[i].y , this.snakeColors[this.snakeColorIndex] , this.rectangleSize );
+    }
 }
 
 Game.prototype.drawRectangle = function (x, y, fillColor, size) {
@@ -42,39 +102,33 @@ Game.prototype.drawGrid = function () {
 }
 
 Game.prototype.animate = function () {
-    this.cycle++;
-    if(this.cycle >= 50) {
-	this.cycle = 0;
+    if(this.cycle % 25 == 0) {
 	this.snakeColorIndex = ( this.snakeColorIndex + 1) % this.snakeColors.length;
     }
 }
 
 Game.prototype.update = function () {
+    this.cycle++;
     this.animate();
+    this.moveSnake();
     this.drawGrid();
-    this.drawRectangle(this.playerRectangle.x,this.playerRectangle.y,this.snakeColors[this.snakeColorIndex],this.rectangleSize);
+    this.drawSnake();
 }
 
 Game.prototype.keyDown = function (keyCode) {
-    switch(keyCode){
+    switch(keyCode) {
     case KEY.UP:
-	this.playerRectangle.y -= 1;
+	this.segments[0].direction = DIRECTION.UP;
 	break;
     case KEY.DOWN:
-	this.playerRectangle.y += 1;
+	this.segments[0].direction = DIRECTION.DOWN;
 	break;
     case KEY.LEFT:
-	this.playerRectangle.x -=1;
+	this.segments[0].direction = DIRECTION.LEFT;
 	break;
     case KEY.RIGHT:
-	this.playerRectangle.x +=1;
+	this.segments[0].direction = DIRECTION.RIGHT;
 	break;
     }
-    this.playerRectangle.x %= this.width;
-    this.playerRectangle.y %= this.height;
-    if(this.playerRectangle.x < 0)
-	this.playerRectangle.x = this.width + this.playerRectangle.x;
-    if(this.playerRectangle.y < 0)
-	this.playerRectangle.y = this.height + this.playerRectangle.y;
 }
 
