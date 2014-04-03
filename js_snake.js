@@ -73,6 +73,8 @@ var Game = function(canvasId) {
     this.canvas.focus();
     this.cycle=0;
     this.segments = [];
+    this.food = new Segment(0,0);
+    this.placeSegmentAtRandom(this.food);
     this.initSegments();
     var instance = this;
     $("#"+canvasId).keydown( function(event) { instance.keyDown(event.keyCode); } );
@@ -81,19 +83,24 @@ var Game = function(canvasId) {
 
 Game.prototype.initSegments = function () {
     for(var i = 0; i < 3; i ++ ) {
-	this.segments.push( new Segment(12 - i , 12) );
+	this.segments.push( new Segment(12 + i , 12) );
 	this.segments[i].direction = DIRECTION.RIGHT;
     }
 }
 
 
+Game.prototype.placeSegmentAtRandom = function (segment) {
+    segment.x = Math.floor( Math.random() * this.width);
+    segment.y = Math.floor( Math.random() * this.height);
+}
+
 Game.prototype.moveSnake = function () {
     if( this.cycle % 10 == 0 ) {
-	for( var i = 0; i < this.segments.length; i++ ) {
+	for( var i = this.segments.length - 1; i >= 0; i-- ) {
 	    this.segments[i].move( this.width , this.height );
 	}
-	for( var i = this.segments.length - 1; i > 0; i-- ) {
-	    this.segments[i].direction = this.segments[ i - 1 ].direction;
+	for( var i = 0; i < this.segments.length - 1; i++ ) {
+	    this.segments[i].direction = this.segments[ i+1 ].direction;
 	}
     }
 }
@@ -134,20 +141,22 @@ Game.prototype.update = function () {
     this.moveSnake();
     this.drawGrid();
     this.drawSnake();
+    this.drawRectangle( this.food.x , this.food.y , this.snakeColors[this.snakeColorIndex] , this.rectangleSize );
 }
 
 Game.prototype.keyDown = function (keyCode) {
+    var lastSegment = this.segments[this.segments.length-1];
     switch(keyCode) {
     case KEY.UP:
-	this.segments[0].requestMove(DIRECTION.UP);
+	lastSegment.requestMove(DIRECTION.UP);
     case KEY.DOWN:
-	this.segments[0].requestMove(DIRECTION.DOWN);
+	lastSegment.requestMove(DIRECTION.DOWN);
 	break;
     case KEY.LEFT:
-	this.segments[0].requestMove(DIRECTION.LEFT);
+	lastSegment.requestMove(DIRECTION.LEFT);
 	break;
     case KEY.RIGHT:	
-	this.segments[0].requestMove(DIRECTION.RIGHT);
+	lastSegment.requestMove(DIRECTION.RIGHT);
 	break;
     }
 }
