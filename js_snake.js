@@ -16,6 +16,8 @@ var Segment = function(x,y) {
     this.direction = null;
 }
 
+
+
 Segment.prototype.move = function (width, height ) {
     switch(this.direction) {
     case DIRECTION.UP :
@@ -118,16 +120,20 @@ Game.prototype.update = function () {
 Game.prototype.keyDown = function (keyCode) {
     switch(keyCode) {
     case KEY.UP:
-	this.segments[0].direction = DIRECTION.UP;
+	if( this.segments[0].direction != DIRECTION.DOWN)
+	    this.segments[0].direction = DIRECTION.UP;
 	break;
     case KEY.DOWN:
-	this.segments[0].direction = DIRECTION.DOWN;
+	if( this.segments[0].direction != DIRECTION.UP)
+	    this.segments[0].direction = DIRECTION.DOWN;
 	break;
     case KEY.LEFT:
-	this.segments[0].direction = DIRECTION.LEFT;
+	if( this.segments[0].direction != DIRECTION.RIGHT)
+	    this.segments[0].direction = DIRECTION.LEFT;
 	break;
     case KEY.RIGHT:
-	this.segments[0].direction = DIRECTION.RIGHT;
+	if( this.segments[0].direction != DIRECTION.LEFT)
+	    this.segments[0].direction = DIRECTION.RIGHT;
 	break;
     }
 }
