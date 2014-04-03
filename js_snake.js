@@ -17,6 +17,25 @@ var Segment = function(x,y) {
 }
 
 
+Segment.prototype.getOppositeDirection = function (direction) {
+    switch(this.direction) {
+    case DIRECTION.UP :
+	return DIRECTION.DOWN;
+    case DIRECTION.DOWN :
+	return DIRECTION.UP;
+    case DIRECTION.LEFT :
+	return DIRECTION.RIGHT;
+    case DIRECTION.RIGHT :
+	return DIRECTION.LEFT;
+    }
+
+}
+
+
+Segment.prototype.requestMove = function (direction) {
+    if ( direction != this.getOppositeDirection(this.direction) )
+	 this.direction = direction;
+}
 
 Segment.prototype.move = function (width, height ) {
     switch(this.direction) {
@@ -120,20 +139,15 @@ Game.prototype.update = function () {
 Game.prototype.keyDown = function (keyCode) {
     switch(keyCode) {
     case KEY.UP:
-	if( this.segments[0].direction != DIRECTION.DOWN)
-	    this.segments[0].direction = DIRECTION.UP;
-	break;
+	this.segments[0].requestMove(DIRECTION.UP);
     case KEY.DOWN:
-	if( this.segments[0].direction != DIRECTION.UP)
-	    this.segments[0].direction = DIRECTION.DOWN;
+	this.segments[0].requestMove(DIRECTION.DOWN);
 	break;
     case KEY.LEFT:
-	if( this.segments[0].direction != DIRECTION.RIGHT)
-	    this.segments[0].direction = DIRECTION.LEFT;
+	this.segments[0].requestMove(DIRECTION.LEFT);
 	break;
-    case KEY.RIGHT:
-	if( this.segments[0].direction != DIRECTION.LEFT)
-	    this.segments[0].direction = DIRECTION.RIGHT;
+    case KEY.RIGHT:	
+	this.segments[0].requestMove(DIRECTION.RIGHT);
 	break;
     }
 }
