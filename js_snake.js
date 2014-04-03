@@ -105,6 +105,19 @@ Game.prototype.moveSnake = function () {
     }
 }
 
+Game.prototype.checkFoodCollision = function () {
+    var lastSegment = this.segments[this.segments.length -1 ];
+    if(lastSegment.x == this.food.x && lastSegment.y == this.food.y ) {
+	var aSegment = new Segment(this.food.x , this.food.y);
+	aSegment.direction = lastSegment.direction;
+	aSegment.move(this.width , this.height);
+	this.segments.push(aSegment);
+	this.food = new Segment(0,0);
+	this.placeSegmentAtRandom(this.food);
+    }
+
+}
+
 Game.prototype.drawSnake = function () {
     for(var i = 0; i < this.segments.length; i++ ) {
 	this.drawRectangle( this.segments[i].x , this.segments[i].y , this.snakeColors[this.snakeColorIndex] , this.rectangleSize );
@@ -139,6 +152,7 @@ Game.prototype.update = function () {
     this.cycle++;
     this.animate();
     this.moveSnake();
+    this.checkFoodCollision();
     this.drawGrid();
     this.drawSnake();
     this.drawRectangle( this.food.x , this.food.y , this.snakeColors[this.snakeColorIndex] , this.rectangleSize );
