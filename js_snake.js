@@ -18,14 +18,24 @@ var Game = function(canvasId) {
     this.canvas.setAttribute('tabindex','0');
     this.canvas.focus();
     this.cycle=0;
+    this.period = 45;
+    this.snakeSpeed = 4.5;
     this.snake = new Snake(this);
     this.food = new Segment(0,0);
     this.placeSegmentAtRandom(this.food);
     var instance = this;
     $("#"+canvasId).keydown( function(event) { instance.keyDown(event.keyCode); } );
-    window.setTimeout( function  callBack() { window.setTimeout(callBack,30); instance.update(); } , 30 );
+    window.setTimeout( function  callBack() { window.setTimeout(callBack,30); instance.update(); } , 45 );
 }
 
+
+Game.prototype.isTicking = function (value) {
+    return this.cycle % this.getRate(value) == 0;
+}
+
+Game.prototype.getRate = function(value) {
+    return Math.floor(this.period / value);
+}
 
 Game.prototype.placeSegmentAtRandom = function (segment) {
     segment.x = Math.floor( Math.random() * this.width);
@@ -34,15 +44,15 @@ Game.prototype.placeSegmentAtRandom = function (segment) {
 
 
 Game.prototype.moveSnake = function () {
-    if(this.cycle % 10 == 0 )
+    if(this.isTicking(this.snakeSpeed) )
 	this.snake.move();
-
 }
 
 Game.prototype.performFoodCollision = function () {
     if ( this.snake.itCollides(this.food) ) {
 	this.snake.grow();
 	this.placeSegmentAtRandom(this.food);
+	this.snakeSpeed += 0.1;
     }
 }
 
@@ -79,7 +89,7 @@ Game.prototype.animate = function () {
 
 Game.prototype.update = function () {
     this.cycle++;
-    this.animate();
+    //this.animate();
     this.moveSnake();
     this.performFoodCollision();
     this.drawGrid();
