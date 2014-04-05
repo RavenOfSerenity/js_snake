@@ -43,10 +43,13 @@ Snake.prototype.move = function () {
 }
 
 
-Snake.prototype.getHead = function() {
+Snake.prototype.getHead = function () {
     return this.segments[this.segments.length - 1];
 }
 
+Snake.prototype.getTail = function () {
+    return this.segments[0];
+}
 
 Snake.prototype.itCollides = function (segment) { 
     var lastSegment = this.getHead();
