@@ -18,20 +18,12 @@ var Game = function(canvasId) {
     this.canvas.setAttribute('tabindex','0');
     this.canvas.focus();
     this.cycle=0;
-    this.segments = [];
+    this.snake = new Snake(this);
     this.food = new Segment(0,0);
     this.placeSegmentAtRandom(this.food);
-    this.initSegments();
     var instance = this;
     $("#"+canvasId).keydown( function(event) { instance.keyDown(event.keyCode); } );
     window.setTimeout( function  callBack() { window.setTimeout(callBack,30); instance.update(); } , 30 );
-}
-
-Game.prototype.initSegments = function () {
-    for(var i = 0; i < 3; i ++ ) {
-	this.segments.push( new Segment(12 + i , 12) );
-	this.segments[i].direction = DIRECTION.RIGHT;
-    }
 }
 
 
@@ -40,44 +32,24 @@ Game.prototype.placeSegmentAtRandom = function (segment) {
     segment.y = Math.floor( Math.random() * this.height);
 }
 
-Game.prototype.wrapSegment = function (segment) {
-    segment.y = segment.y % this.height;
-    if( segment.y < 0 )
-	segment.y = segment.y + this.height;
-    segment.x = segment.x % this.width;
-    if( segment.x < 0 )
-	segment.x = segment.x + this.width;
-
-}
 
 Game.prototype.moveSnake = function () {
-    if( this.cycle % 10 == 0 ) {
-	for( var i = this.segments.length - 1; i >= 0; i-- ) {
-	    this.segments[i].move();
-	    this.wrapSegment( this.segments[i] );
-	}
-	for( var i = 0; i < this.segments.length - 1; i++ ) {
-	    this.segments[i].direction = this.segments[ i+1 ].direction;
-	}
-    }
+    if(this.cycle % 10 == 0 )
+	this.snake.move();
+
 }
 
-Game.prototype.checkFoodCollision = function () {
-    var lastSegment = this.segments[this.segments.length -1 ];
-    if(lastSegment.x == this.food.x && lastSegment.y == this.food.y ) {
-	var aSegment = new Segment(this.food.x , this.food.y);
-	aSegment.direction = lastSegment.direction;
-	aSegment.move(this.width , this.height);
-	this.segments.push(aSegment);
-	this.food = new Segment(0,0);
+Game.prototype.performFoodCollision = function () {
+    if ( this.snake.itCollides(this.food) ) {
+	this.snake.grow();
 	this.placeSegmentAtRandom(this.food);
     }
-
 }
 
 Game.prototype.drawSnake = function () {
-    for(var i = 0; i < this.segments.length; i++ ) {
-	this.drawRectangle( this.segments[i].x , this.segments[i].y , this.snakeColors[this.snakeColorIndex] , this.rectangleSize );
+    var segments = this.snake.segments;
+    for(var i = 0; i < segments.length; i++ ) {
+	this.drawRectangle( segments[i].x , segments[i].y , this.snakeColors[this.snakeColorIndex] , this.rectangleSize );
     }
 }
 
@@ -109,14 +81,14 @@ Game.prototype.update = function () {
     this.cycle++;
     this.animate();
     this.moveSnake();
-    this.checkFoodCollision();
+    this.performFoodCollision();
     this.drawGrid();
     this.drawSnake();
     this.drawRectangle( this.food.x , this.food.y , this.snakeColors[this.snakeColorIndex] , this.rectangleSize );
 }
 
 Game.prototype.keyDown = function (keyCode) {
-    var lastSegment = this.segments[this.segments.length-1];
+    var lastSegment = this.snake.getHead();
     switch(keyCode) {
     case KEY.UP:
 	lastSegment.requestMove(DIRECTION.UP);
