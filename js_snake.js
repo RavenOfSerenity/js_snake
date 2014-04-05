@@ -4,60 +4,6 @@ KEY.DOWN = 40;
 KEY.LEFT = 37;
 KEY.RIGHT = 39;
 
-var DIRECTION = {};
-DIRECTION.UP = 1;
-DIRECTION.DOWN = 2;
-DIRECTION.LEFT = 3;
-DIRECTION.RIGHT = 4;
-
-var Segment = function(x,y) {
-    this.x=x;
-    this.y=y;
-    this.direction = null;
-}
-
-
-Segment.prototype.getOppositeDirection = function (direction) {
-    switch(this.direction) {
-    case DIRECTION.UP :
-	return DIRECTION.DOWN;
-    case DIRECTION.DOWN :
-	return DIRECTION.UP;
-    case DIRECTION.LEFT :
-	return DIRECTION.RIGHT;
-    case DIRECTION.RIGHT :
-	return DIRECTION.LEFT;
-    }
-
-}
-
-
-Segment.prototype.requestMove = function (direction) {
-    if ( direction != this.getOppositeDirection(this.direction) )
-	 this.direction = direction;
-}
-
-Segment.prototype.move = function (width, height ) {
-    switch(this.direction) {
-    case DIRECTION.UP :
-	this.y = ( this.y - 1) % height;
-	break;
-    case DIRECTION.DOWN :
-	this.y = ( this.y + 1 ) % height;
-	break;
-    case DIRECTION.LEFT :
-	this.x = ( this.x - 1 ) % width;
-	break;
-    case DIRECTION.RIGHT :
-	this.x = ( this.x + 1 ) % width;
-	break;
-    }
-    if( this.x < 0 )
-	this.x = width + this.x;
-    if( this.y < 0 )
-	this.y = height + this.y;
-}
-
 var Game = function(canvasId) {
     this.canvas = document.getElementById(canvasId);
     this.ctx = this.canvas.getContext("2d");
@@ -94,10 +40,21 @@ Game.prototype.placeSegmentAtRandom = function (segment) {
     segment.y = Math.floor( Math.random() * this.height);
 }
 
+Game.prototype.wrapSegment = function (segment) {
+    segment.y = segment.y % this.height;
+    if( segment.y < 0 )
+	segment.y = segment.y + this.height;
+    segment.x = segment.x % this.width;
+    if( segment.x < 0 )
+	segment.x = segment.x + this.width;
+
+}
+
 Game.prototype.moveSnake = function () {
     if( this.cycle % 10 == 0 ) {
 	for( var i = this.segments.length - 1; i >= 0; i-- ) {
-	    this.segments[i].move( this.width , this.height );
+	    this.segments[i].move();
+	    this.wrapSegment( this.segments[i] );
 	}
 	for( var i = 0; i < this.segments.length - 1; i++ ) {
 	    this.segments[i].direction = this.segments[ i+1 ].direction;
