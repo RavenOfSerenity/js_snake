@@ -9,6 +9,10 @@ var Game = function(canvasId) {
     this.ctx = this.canvas.getContext("2d");
     this.defaultGridColour = COLOURS.BLUE;
     this.defaultSnakeColour = COLOURS.YELLOW;
+    this.snakeGlowEffect = new ColourTransformer(this.defaultSnakeColour , COLOURS.GREEN,350);
+    this.snakeGlowEffect.bidirectional = true;
+    this.foodGlowEffect = new ColourTransformer(COLOURS.GREEN, COLOURS.PINK, 100);
+    this.foodGlowEffect.bidirectional = true;
     this.defaultFoodColour = COLOURS.GREEN;
     this.snakeColours = [ 'blue','lime','mintcream','brown','fuchsia','turquoise'];
     this.snakeColourIndex = 0;
@@ -36,7 +40,7 @@ Game.prototype.initGrid = function () {
     for(var x  = 0; x < this.width; x++ ) {
 	this.grid[x] = [];
 	for(var y = 0; y < this.height; y++ ) {
-	    this.grid[x][y] = new ColourTransformer(COLOURS.ORANGE,this.defaultGridColour,250);
+	    this.grid[x][y] = new ColourTransformer(COLOURS.ORANGE,this.defaultGridColour,100);
 	    this.grid[x][y].finalState();
 	}
     }
@@ -80,7 +84,7 @@ Game.prototype.performFoodCollision = function () {
 Game.prototype.drawSnake = function () {
     var segments = this.snake.segments;
     for(var i = 0; i < segments.length; i++ ) {
-	this.drawRectangle( segments[i].x,segments[i].y,this.defaultSnakeColour.getCSS(),this.rectangleSize );
+	this.drawRectangle( segments[i].x,segments[i].y,this.snakeGlowEffect.curr.getCSS(),this.rectangleSize );
     }
 }
 
@@ -89,7 +93,7 @@ Game.prototype.drawRectangle = function (x, y, fillColor, size) {
     this.ctx.rect(x * size, y * size, size, size);
     this.ctx.fillStyle = fillColor;
     this.ctx.fill();
-    this.ctx.lineWidth = 3;
+    this.ctx.lineWidth = 1;
     this.ctx.strokeStyle = 'black'
     this.ctx.stroke();
 }
@@ -116,13 +120,15 @@ Game.prototype.trailEffect = function () {
 Game.prototype.update = function () {
     this.cycle++;
     this.trailEffect();
+    this.snakeGlowEffect.tick();
+    this.foodGlowEffect.tick();
     this.updateGrid();
     //this.animate();
     this.moveSnake();
     this.performFoodCollision();
     this.drawGrid();
     this.drawSnake();
-    this.drawRectangle( this.food.x , this.food.y , this.defaultFoodColour.getCSS() , this.rectangleSize );
+    this.drawRectangle( this.food.x , this.food.y , this.foodGlowEffect.curr.getCSS() , this.rectangleSize );
 }
 
 Game.prototype.keyDown = function (keyCode) {
