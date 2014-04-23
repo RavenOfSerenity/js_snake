@@ -60,11 +60,17 @@ Snake.prototype.itCollides = function (segment) {
 
 }
 
+Snake.prototype.getRandomDirection = function() {
+    var nr = Math.floor( Math.random() * 4);
+    return nr+1;
+}
+
 Snake.prototype.grow = function () {
     var lastSegment = this.getHead();
     var aSegment = new Segment(lastSegment.x , lastSegment.y);
-    aSegment.direction = lastSegment.direction;
-    aSegment.move();
+    aSegment.direction = this.getRandomDirection();
+    ///aSegment.direction = lastSegment.direction;
+    //aSegment.move();
     this.wrapSegment(aSegment);
     this.segments.push(aSegment);
 }
