@@ -9,7 +9,7 @@ var Game = function(canvasId) {
     this.ctx = this.canvas.getContext("2d");
     this.defaultGridColour = COLOURS.YELLOW;
     this.defaultSnakeColour = COLOURS.BLUE;
-    this.defaultFoodColour = 'red';
+    this.defaultFoodColour = COLOURS.GREEN;
     this.snakeColours = [ 'blue','lime','mintcream','brown','fuchsia','turquoise'];
     this.snakeColourIndex = 0;
     this.width=25;
@@ -36,7 +36,7 @@ Game.prototype.initGrid = function () {
     for(var x  = 0; x < this.width; x++ ) {
 	this.grid[x] = [];
 	for(var y = 0; y < this.height; y++ ) {
-	    this.grid[x][y] = new ColourTransformer(this.defaultSnakeColour,this.defaultGridColour,100);
+	    this.grid[x][y] = new ColourTransformer(COLOURS.ORANGE,this.defaultGridColour,250);
 	    this.grid[x][y].finalState();
 	}
     }
@@ -122,7 +122,7 @@ Game.prototype.update = function () {
     this.performFoodCollision();
     this.drawGrid();
     this.drawSnake();
-    this.drawRectangle( this.food.x , this.food.y , this.defaultFoodColour , this.rectangleSize );
+    this.drawRectangle( this.food.x , this.food.y , this.defaultFoodColour.getCSS() , this.rectangleSize );
 }
 
 Game.prototype.keyDown = function (keyCode) {
