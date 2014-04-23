@@ -68,9 +68,9 @@ Snake.prototype.getRandomDirection = function() {
 Snake.prototype.grow = function () {
     var lastSegment = this.getHead();
     var aSegment = new Segment(lastSegment.x , lastSegment.y);
-    aSegment.direction = this.getRandomDirection();
-    ///aSegment.direction = lastSegment.direction;
-    //aSegment.move();
+    //aSegment.direction = this.getRandomDirection();
+    aSegment.direction = lastSegment.direction;
+    aSegment.move();
     this.wrapSegment(aSegment);
     this.segments.push(aSegment);
 }
