@@ -10,6 +10,7 @@ COLOURS.RED = new Colour(255,0,0);
 COLOURS.GREEN = new Colour(0,255,0);
 COLOURS.BLUE = new Colour(0,0,255);
 COLOURS.YELLOW = new Colour(255,255,0);
+COLOURS.ORANGE = new Colour(255,70,0);
 
 Colour.prototype.clone = function(colour) {
     return new Colour(colour.red,colour.green,colour.blue);
